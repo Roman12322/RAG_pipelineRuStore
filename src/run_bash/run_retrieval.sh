@@ -1,0 +1,1 @@
+python ~/projects/0206/src/retrieval/retrieval.py

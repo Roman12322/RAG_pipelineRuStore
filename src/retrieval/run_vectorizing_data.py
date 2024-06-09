@@ -40,7 +40,7 @@ def upsert_data(index, data, embedding_model):
         batch = data.iloc[i:i_end]
         ids = [str(idx) for idx in range(i, i_end)] # TODO set some row_id for each chunk
         print(f"ids: {ids}\n")
-        texts = [x['answer'] for i, x in batch.iterrows()] # TODO extract chunk of text from dataframe 
+        texts = [x['question'] for i, x in batch.iterrows()] # TODO extract chunk of text from dataframe 
         embeds = embedding_model.embed_documents(texts)
         # print(f"shape of embeddings: {np.asarray(embeds).shape}")
         # print(f"texts: \n {texts}")
@@ -67,7 +67,7 @@ def init_db_index(index_name, api_key):
 # embed_model = init_embedding_model() # Initial embedding model with 384 dim_size
 
 # # UPSERT DATA TO OUR VECTOR_STORE
-# data = read_dataset("../data/dataset.json")
+# data = read_dataset("../../data/dataset.json")
 # upsert_data(index, data, embed_model)
 
 

@@ -8,6 +8,8 @@ from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 import warnings
 from pprint import pprint
+import gradio as gr
+
 warnings.filterwarnings('ignore')
 
 def init_vectorstore(index, embedding_model, text_field):
@@ -19,17 +21,18 @@ def init_vectorstore(index, embedding_model, text_field):
 def build_llm():
     callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
     llm = LlamaCpp(
-            model_path='../../../.cache/huggingface/hub/models--TheBloke--Mistral-7B-Instruct-v0.2-GGUF/snapshots/3a6fbf4a41a1d52e415a4958cde6856d34b2db93/mistral-7b-instruct-v0.2.Q4_K_M.gguf', 
+            model_path='../../../../.cache/huggingface/hub/models--TheBloke--Mistral-7B-Instruct-v0.2-GGUF/snapshots/3a6fbf4a41a1d52e415a4958cde6856d34b2db93/mistral-7b-instruct-v0.2.Q4_K_M.gguf', 
             temperature=0.0,
             f16_kv=True,
-            max_tokens = 550,
+            max_tokens = 250,
             n_ctx=8000,
             n_gpu_layers=1,
-            n_batch=512,
+            n_batch=250,
             verbose=False, 
             top_p=0.75,
             top_k=40,
-            repetition_penalty=1.1, 
+            repetition_penalty=1.1,
+            callback_manager = callback_manager
     )
     return llm
     
@@ -45,18 +48,23 @@ def init_langchain_retrieval(vectorstore):
     )
     return rag_pipeline
 
-def query(user_query):
+def query(message, history):
+    
     embed_model = init_embedding_model() # Initial embedding model with 384 dim_size
     
     pc, index  = init_db_index(index_name = 'tinkoff', api_key=PINECONE_API)
     vector_store = init_vectorstore(index, embed_model, text_field='question')
-
+    
     rag = init_langchain_retrieval(vector_store)
-    return rag(user_query)
 
-rag_response = query('Сколько стоит открыть брокерский счет для юрлиц?')
-print(f"### response\n {rag_response['result']}")
-pprint(f"### Source documents\n {rag_response['source_documents']}")
+    response = rag(message)
+    final = ""
+    for item in response['result']:
+        final+= item
+        yield final
+
+gr.ChatInterface(query).launch(share=True)
+
 
 
 
