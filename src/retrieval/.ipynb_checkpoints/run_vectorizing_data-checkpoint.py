@@ -3,24 +3,25 @@ from torch import cuda
 from datasets import load_dataset
 from pinecone import Pinecone
 from config import PINECONE_API
-from langchain.llms import HuggingFacePipeline
+# from langchain.llms import HuggingFacePipeline
 from transformers import pipeline
-from langchain.chains import RetrievalQA
+# from langchain.chains import RetrievalQA
 import pandas as pd
 import numpy as np
 import json
 import os
 
-def read_dataset(path):
-    with open(path, 'r') as f:
-        data = f.read()
-        data = json.loads(data)
-    
-    dataframe = pd.DataFrame(data['data'])
-    qna = dataframe[['title', 'description', 'parent_url']]
-    qna = qna.rename(columns={'title':'question','description': 'answer','parent_url': 'link'})
-    print(qna.head(3))
-    return qna
+def set_nan_as_empty(row):
+    if isinstance(row, float):
+        return 'empty'
+    else:
+        return row
+
+def read_dataset():
+    df = pd.read_excel("Книга1.xlsx")
+    df.columns = ['question', 'response', 'link']
+    df['link'] = df['link'].apply(set_nan_as_empty)
+    return df
 
 def init_embedding_model():
     embed_model_id = 'sentence-transformers/all-MiniLM-L6-v2'
@@ -40,17 +41,13 @@ def upsert_data(index, data, embedding_model):
         batch = data.iloc[i:i_end]
         ids = [str(idx) for idx in range(i, i_end)] # TODO set some row_id for each chunk
         print(f"ids: {ids}\n")
-        texts = [x['answer'] for i, x in batch.iterrows()] # TODO extract chunk of text from dataframe 
+        texts = [x['question'] for i, x in batch.iterrows()] # TODO extract chunk of text from dataframe 
         embeds = embedding_model.embed_documents(texts)
-        # print(f"shape of embeddings: {np.asarray(embeds).shape}")
-        # print(f"texts: \n {texts}")
-        # get metadata to store in Pinecone
         metadata = [
-            {'answer': x['answer'],
-            'source': x['link'],
+            {'response': x['response'],
+            'link': x['link'],
             'question': x['question']} for i, x in batch.iterrows()
         ] # TODO set OWN METADATA
-        # print(f"\metadata: \n {metadata}")
         index.upsert(vectors=zip(ids, embeds, metadata))
 
 
@@ -62,12 +59,12 @@ def init_db_index(index_name, api_key):
     return pc, index
 
 
-# index_name = 'tinkoff'
-# pc, index = init_db_index(index_name=index_name, api_key=PINECONE_API) # Initial index for Pinecone Vector store
-# embed_model = init_embedding_model() # Initial embedding model with 384 dim_size
+index_name = 'rustore'
+pc, index = init_db_index(index_name=index_name, api_key=PINECONE_API) # Initial index for Pinecone Vector store
+embed_model = init_embedding_model() # Initial embedding model with 384 dim_size
 
 # # UPSERT DATA TO OUR VECTOR_STORE
-# data = read_dataset("../data/dataset.json")
+# data = read_dataset()
 # upsert_data(index, data, embed_model)
 
 
