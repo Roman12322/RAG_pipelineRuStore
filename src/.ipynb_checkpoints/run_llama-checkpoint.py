@@ -20,7 +20,7 @@ def init_vectorstore(index, embedding_model, text_field):
 llm = Llama(
     "../../../.cache/huggingface/hub/models--TheBloke--Mistral-7B-Instruct-v0.2-GGUF/snapshots/3a6fbf4a41a1d52e415a4958cde6856d34b2db93/mistral-7b-instruct-v0.2.Q4_K_M.gguf",
     n_gpu_layers=30,
-    n_ctx=1024
+    n_ctx=2048
     # put YOUR MODEL HERE
 )
 
@@ -40,7 +40,7 @@ def get_context(message):
 def call_llama(prompt):
     stream = llm(
     prompt,
-  max_tokens=350,
+  max_tokens=1500,
   temperature=0.0,
   stream=True
     )
@@ -53,23 +53,21 @@ def send_message(message, history):
         
         while flag:
             prompt = f"""<s>[INST] You're the most smartest expert in Java Programming. Generate function for this context and in the end of your response put <eot>:\n ### Question:\n{message}\n###Context:\n{context}\nContinue your response: ### Response:\n{generated}\n[/INST]"""      
-            try:
-                stream = call_llama(prompt)
-                for output in stream:
-                    out = json.dumps(output, indent=2)
-                    converted = json.loads(out)
-                    streamed_output = converted['choices'][0]['text']
-                    if generated.lower().__contains__('<eot>'):
-                        flag=False
-                        break
-                    else:    
-                        generated += streamed_output
-                        yield generated
-                if generated.__contains__('<eot>'):
+            stream = call_llama(prompt)
+            for output in stream:
+                out = json.dumps(output, indent=2)
+                converted = json.loads(out)
+                streamed_output = converted['choices'][0]['text']
+                if generated.lower().__contains__('<eot>'):
                     flag=False
-            except:
-                yield generated
-                break
+                    break
+                else:    
+                    generated += streamed_output
+                    yield generated
+            if generated.__contains__('<eot>'):
+                flag=False
+
+            
                     
 
 gr.ChatInterface(send_message).launch(share=True)
