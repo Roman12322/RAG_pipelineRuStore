@@ -17,6 +17,6 @@ We ARE looking forward to enhance UX with RuStore documetation using Q&A CHATBOT
 
 ## 🛠️ USE IT RIGHT NOW!
 
-[Try Code model] (https://8421d2a2b635e4117d.gradio.live/)
+[Try Code model](https://8421d2a2b635e4117d.gradio.live/)
 
-[Try regular model] (https://101e75122db22749f3.gradio.live/)
+[Try regular model](https://101e75122db22749f3.gradio.live/)
