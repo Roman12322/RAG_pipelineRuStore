@@ -68,6 +68,7 @@ def send_message(message, history):
                 if generated.__contains__('<eot>'):
                     flag=False
             except:
+                yield generated
                 break
                     
 
