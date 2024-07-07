@@ -3,9 +3,7 @@ from torch import cuda
 from datasets import load_dataset
 from pinecone import Pinecone
 from config import PINECONE_API
-# from langchain.llms import HuggingFacePipeline
 from transformers import pipeline
-# from langchain.chains import RetrievalQA
 import pandas as pd
 import numpy as np
 import json
