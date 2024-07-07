@@ -20,7 +20,7 @@ def init_vectorstore(index, embedding_model, text_field):
 llm = Llama(
     "../../../.cache/huggingface/hub/models--TheBloke--Mistral-7B-Instruct-v0.2-GGUF/snapshots/3a6fbf4a41a1d52e415a4958cde6856d34b2db93/mistral-7b-instruct-v0.2.Q4_K_M.gguf",
     n_gpu_layers=30,
-    n_ctx=1024
+    n_ctx=512
     # put YOUR MODEL HERE
 )
 
@@ -47,7 +47,6 @@ def call_llama(prompt):
     return stream
 
 def send_message(message, history):
-    try:
         generated = ''
         flag = True
         context = get_context(message)  # Get context for code generation from documentation
@@ -67,8 +66,6 @@ def send_message(message, history):
                     yield generated
             if generated.__contains__('<eot>'):
                 flag=False
-    except:
-        pass
 
 gr.ChatInterface(send_message).launch(share=True)
 
