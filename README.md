@@ -6,7 +6,7 @@ We ARE looking forward to enhance UX with RuStore documetation using Q&A CHATBOT
 
 ## 🎥 Demo
 
-![Demo](https://www.youtube.com/watch?v=laijtaEV8oA)
+[Demo](https://www.youtube.com/watch?v=laijtaEV8oA)
 
 ## 🚀 Features
 
