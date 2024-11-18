@@ -1,6 +1,7 @@
 # 🚀 Super Cool RuStore Project
 
 ## 🌟 Overview
+[image](https://github.com/user-attachments/assets/95921eed-dedb-4104-bfd3-d1fd812586b1)
 
 We ARE looking forward to enhance UX with RuStore documetation using Q&A CHATBOTS FOR CODERS AND REGULAR USERS
 
